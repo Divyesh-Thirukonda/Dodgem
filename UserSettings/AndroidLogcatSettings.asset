@@ -3,7 +3,7 @@
     "m_SelectedPackage": {
         "deviceId": "R5CRA1ZK6QR",
         "name": "com.DefaultCompany.Dodgem",
-        "processId": 21581,
+        "processId": 27543,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -90,6 +90,12 @@
             "deviceId": "R5CRA1ZK6QR",
             "name": "com.DefaultCompany.Dodgem",
             "processId": 21581,
+            "exited": false
+        },
+        {
+            "deviceId": "R5CRA1ZK6QR",
+            "name": "com.DefaultCompany.Dodgem",
+            "processId": 27543,
             "exited": false
         }
     ],

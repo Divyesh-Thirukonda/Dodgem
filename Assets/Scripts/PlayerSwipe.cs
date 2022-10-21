@@ -15,7 +15,7 @@ public class PlayerSwipe : MonoBehaviour
     public float tapRange;
 
     // amount of gold collected
-    float gold = 0;
+    public float gold = 0;
 
     // UI
     public TextMeshProUGUI coinText;
@@ -31,10 +31,19 @@ public class PlayerSwipe : MonoBehaviour
 
     public TextMeshProUGUI finalScore;
 
+    public static float magnetRadius = 1.5f;
+    public static float timeSpeed = 1;
+
+    
+
+    void Start() {
+        updateJumps();
+        timeSpeed = 1;
+    }
     
     void Update()
     {
-        Swipee();
+        Swipe();
 
         finalScore.text = scoreText.text;
 
@@ -46,6 +55,18 @@ public class PlayerSwipe : MonoBehaviour
         if(transform.position.y < -0.25f) {
             transform.position = new Vector3(transform.position.x, -0.25f, transform.position.z);
         }
+
+
+        // Powerups in action
+        foreach(GameObject target in GameObject.FindGameObjectsWithTag("gold")) {
+            if(Mathf.Sqrt(Mathf.Pow(transform.position.x - target.gameObject.transform.position.x, 2)+Mathf.Pow(transform.position.z - target.gameObject.transform.position.z, 2)) < magnetRadius) {
+                IncreaseGold();
+                coinAudio.Play();
+                Destroy(target.gameObject);
+            }
+        }
+
+        Time.timeScale = timeSpeed;
     }
 
     string UIupdate(float numToConvert) {
@@ -143,9 +164,7 @@ public class PlayerSwipe : MonoBehaviour
         foreach (GameObject blocks in GameObject.FindGameObjectsWithTag("allSpawns")) {
             Destroy(blocks);
         }
-        // GetComponent<FirebaseCoins>().SaveButton(); // ALSO DO THIS WHEN YOU PURCHASE SMTH
     }
-
 
     void IncreaseGold() {
         gold++;
@@ -154,10 +173,8 @@ public class PlayerSwipe : MonoBehaviour
         Spawn.scoreMultiplier *= (float)2;
     }
 
-    // private Vector2 startTouchPosition;
-    // private Vector2 endTouchPosition;
     float dragDistance = Screen.height * 2 / 100;
-    void Swipee() {
+    void Swipe() {
         if (Input.touchCount > 0 && Input.GetTouch (0).phase == TouchPhase.Began) 
         {
             startTouchPosition = Input.GetTouch(0).position;
@@ -181,7 +198,7 @@ public class PlayerSwipe : MonoBehaviour
                             isJump = false;
                         }
                     }
-                    if(endTouchPosition.y>startTouchPosition.y){
+                    if(endTouchPosition.y>startTouchPosition.y && transform.position.y == -0.25f){
                         try {
                             GameObject.Find("UI Script").GetComponent<UiScript>().playerJump();
                             updateJumps();
@@ -194,61 +211,11 @@ public class PlayerSwipe : MonoBehaviour
         }
     }
 
-    void Swipe()
-    {
-        if(Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began) {
-            startTouchPosition = Input.GetTouch(0).position;
-        }
-        if(Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved) {
-            currentTouchPosition = Input.GetTouch(0).position;
-            Vector2 Distance = currentTouchPosition - startTouchPosition;
-
-            if(!stopTouch) {
-                // if swipe up more than 5 on Y, and the fingers stay between 3 and -3 on the X, it's up swipe. Try jumping. If player doesn't have the jump-boost, then it swipes left or right
-                if(Distance.y > swipeRange && ((Distance.x < 2f) | (Distance.x > -2f))) {
-                    Debug.Log("up");
-                    // up
-                    try {
-                        GameObject.Find("UI Script").GetComponent<UiScript>().playerJump();
-                        updateJumps();
-                    } catch {
-                        // oh well
-                    }
-                    stopTouch = true;
-                } else if(Distance.y < -swipeRange && ((Distance.x < 2f) | (Distance.x > -2f))) {
-                    Debug.Log("down");
-                    if (isJump) {
-                        transform.position += new Vector3(0, -1.25f, 0);
-                    }
-                } else if(Distance.x < -.2f && ((Distance.y < 2) | (Distance.y > -2)) && transform.position.x != (float)-1.4) {
-                    // left
-                    Debug.Log("left");
-                    transform.position += new Vector3((float)-1.4, 0, 0);
-                    stopTouch = true;
-                    return;
-                } else if(Distance.x > .2f && ((Distance.y < 2) | (Distance.y > -2)) && transform.position.x != (float)1.4) {
-                    // right
-                    Debug.Log("right");
-                    transform.position += new Vector3((float)1.4, 0, 0);
-                    stopTouch = true;
-                    return;
-                }
-                
-            }
-        }
-
-        if(Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended) {
-            stopTouch = false;
-            endTouchPosition = Input.GetTouch(0).position;
-            Vector2 Distance = endTouchPosition - startTouchPosition;
-            if(Mathf.Abs(Distance.x) < tapRange && Mathf.Abs(Distance.y) < tapRange) {
-                //tap
-            }
-        }
-    }
-
-
     bool isJump;
+
+    public void physicallyJump() {
+        StartCoroutine(Jumpy());
+    }
 
     IEnumerator Jumpy()
     {
@@ -266,15 +233,7 @@ public class PlayerSwipe : MonoBehaviour
         }
     }
     
-    public void physicallyJump() {
-        // Jump
-        StartCoroutine(Jumpy());
-    }
 
-
-    void Start() {
-        updateJumps();
-    }
 
     public TextMeshProUGUI textOfJumps;
     public void updateJumps() {

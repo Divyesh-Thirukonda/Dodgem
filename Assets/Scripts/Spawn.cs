@@ -4,18 +4,15 @@ using UnityEngine;
 
 public class Spawn : MonoBehaviour
 {
-    // This script basically stores a bunch of variables and also spawns the buildings
+    // This script stores variables and also spawns the buildings
     
-    public GameObject[] blocksToSpawn; // blocks to place (essentially static)
-
+    public GameObject[] blocksToSpawn; // blocks to place
     private GameObject nextBlock;
+    public GameObject transformOfLastPlacementReference;
 
     System.Random random = new System.Random();
 
     public static float timeForNextBlock = 0;
-
-    public GameObject transformOfLastPlacementReference;
-
     public static float playerSpeed = 1000f;
     public static float numOfBlocksSpawned;
     public static float points = 0;
@@ -36,8 +33,7 @@ public class Spawn : MonoBehaviour
 
 
         if (timeForNextBlock >= .8) {
-            // code to do when its time to place a new block
-            nextBlock = blocksToSpawn[random.Next(0,6)]; //random number 0, 1, 2... 12, 13
+            nextBlock = blocksToSpawn[random.Next(0,6)];
             nextBlock = Instantiate(nextBlock, transformOfLastPlacementReference.transform);
             numOfBlocksSpawned++;
             nextBlock.transform.parent = null;

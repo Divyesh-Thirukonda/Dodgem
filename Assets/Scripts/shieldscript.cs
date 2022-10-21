@@ -7,7 +7,7 @@ public class shieldscript : MonoBehaviour
     
     System.Random random = new System.Random();
 
-    // Start is called before the first frame update
+    // How often a shield is generated (1 in 15 chance)
     void Start()
     {
         int x = random.Next(0,15);
